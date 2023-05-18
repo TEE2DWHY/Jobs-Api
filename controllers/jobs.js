@@ -7,7 +7,7 @@ const getJob = (req, res) => {
 };
 
 const createJob = (req, res) => {
-  res.status(201).json({ msg: "new job is created" });
+  res.status(201).json(req.user);
 };
 
 const updateJob = (req, res) => {
