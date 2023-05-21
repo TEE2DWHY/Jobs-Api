@@ -3,7 +3,7 @@ const { StatusCodes } = require("http-status-codes");
 
 const authorization = async (req, res, next) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith === "Bearer ") {
+  if (!authHeader || !authHeader.startsWith("Bearer")) {
     return res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ msg: "Authentication invalid" });
@@ -11,8 +11,8 @@ const authorization = async (req, res, next) => {
   const token = authHeader.split(" ")[1];
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    const { _id, name } = payload;
-    req.user = { _id, name, token };
+    const { userId, name } = payload;
+    req.user = { userId, name };
     next();
   } catch (err) {
     res.status(StatusCodes.UNAUTHORIZED).json({ msg: "Unauthorized user" });

@@ -6,7 +6,7 @@ const authRouter = require("./routes/auth");
 const jobRouter = require("./routes/jobs");
 const notFound = require("./middleWare/notFound");
 const errorHandler = require("./middleWare/errorHandler");
-const authMiddleWear = require("./middleWare/authorization");
+const authMiddleWear = require("./middleWare/authentication");
 //middleWear
 app.use(express.json());
 app.use("/api/v1/auth", authRouter);
