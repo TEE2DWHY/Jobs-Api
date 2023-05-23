@@ -2,13 +2,25 @@ const Job = require("../models/Jobs");
 const { StatusCodes } = require("http-status-codes");
 const asyncWrapper = require("../middleWare/asyncWrapper");
 
-const getAllJobs = (req, res) => {
-  res.status(200).json({ msg: "this is a result of all jobs" });
-};
+const getAllJobs = asyncWrapper(async (req, res) => {
+  const allJobs = await Job.find({ createdBy: req.user.userId }).sort(
+    "createdAt"
+  );
+  res.status(StatusCodes.OK).json({ allJobs });
+});
 
-const getJob = (req, res) => {
-  res.status(200).json({ msg: "job output" });
-};
+const getJob = asyncWrapper(async (req, res) => {
+  const job = await Job.find({
+    _id: req.params.id,
+    createdBy: req.user.userId,
+  });
+  if (!job) {
+    return res
+      .status(StatusCodes.NOT_FOUND)
+      .json({ msg: `Job with ${id} does not exist` });
+  }
+  res.status(StatusCodes.OK).json({ job });
+});
 
 const createJob = asyncWrapper(async (req, res) => {
   req.body.createdBy = req.user.userId;
