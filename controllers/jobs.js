@@ -31,12 +31,35 @@ const createJob = asyncWrapper(async (req, res) => {
     .json({ msg: "new job is created", job: newJob });
 });
 
-const updateJob = (req, res) => {
-  res.status(200).json({ msg: "job detail is updated" });
-};
+const updateJob = asyncWrapper(async (req, res) => {
+  const { company, position } = req.body;
+  if (company === "" || position === "") {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ msg: "company or position fields cannot be empty" });
+  }
+  const job = await Job.findByIdAndUpdate(
+    { _id: req.params.id, createdBy: req.user.userId },
+    req.body,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  if (!job) {
+    return res
+      .status(StatusCodes.NOT_FOUND)
+      .json({ msg: `id: ${req.params.id} does not exist.` });
+  }
+  res.status(StatusCodes.OK).json({ job });
+});
 
-const deleteJob = (req, res) => {
-  res.status(200).json({ msg: "job is deleted" });
-};
+const deleteJob = asyncWrapper(async (req, res) => {
+  const job = await Job.findByIdAndDelete({
+    _id: req.params.id,
+    createdBy: req.user.userId,
+  });
+  res.status(StatusCodes.OK).send();
+});
 
 module.exports = { getAllJobs, getJob, createJob, updateJob, deleteJob };
