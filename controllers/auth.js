@@ -3,6 +3,7 @@ const asyncWrapper = require("../middleWare/asyncWrapper");
 const { StatusCodes } = require("http-status-codes");
 const cryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/sendEmail");
 
 const register = asyncWrapper(async (req, res) => {
   //Register new user
@@ -13,6 +14,11 @@ const register = asyncWrapper(async (req, res) => {
       req.body.password,
       process.env.SECRET
     ).toString(),
+  });
+  sendEmail({
+    email: req.body.email,
+    subject: "Confirm Email Address",
+    message: "Confirm email address by using this Link",
   });
   res.status(StatusCodes.CREATED).json({
     msg: "user created successfully",
