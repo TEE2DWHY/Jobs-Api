@@ -6,24 +6,32 @@ const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
 
 const register = asyncWrapper(async (req, res) => {
-  //Register new user
-  const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: cryptoJs.AES.encrypt(
-      req.body.password,
-      process.env.SECRET
-    ).toString(),
-  });
-  sendEmail({
-    email: req.body.email,
-    subject: "Confirm Email Address",
-    message: "Confirm email address by using this Link",
-  });
-  res.status(StatusCodes.CREATED).json({
-    msg: "user created successfully",
-    user: { name: newUser.name },
-  });
+  // Register new user
+  try {
+    const newUser = await User.create({
+      name: req.body.name,
+      email: req.body.email,
+      password: cryptoJs.AES.encrypt(
+        req.body.password,
+        process.env.SECRET
+      ).toString(),
+    });
+
+    await sendEmail({
+      email: req.body.email,
+      subject: "Confirm Email Address",
+      message: "Confirm email address by using this Link",
+    });
+
+    res.status(StatusCodes.CREATED).json({
+      msg: "user created successfully",
+      user: { name: newUser.name },
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      error: "An error occurred while sending the email.",
+    });
+  }
 });
 
 const login = asyncWrapper(async (req, res) => {
